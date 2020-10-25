@@ -9,25 +9,26 @@ namespace Solver{
 template<typename Vector, typename Field>
 class BFS : public BaseHoodSolver<Vector, Field> {
 protected:
-    bool finished = false;
 
     void do_optimization_step(int step) override {
-        if (finished) {
-            return;
-        }
 
-        auto ptr = Solver::Utils::GetNeighborhoodHeming(this->best_solution, this->field);
-        for (auto& neighbor : *ptr) {
-            int new_score = this->score(neighbor);
-            if (new_score > this->best_score) {
-                this->best_score = new_score;
-                this->best_solution = neighbor;
+        this->UpdateHood();
+
+        auto ptr = this->neighborhood;
+
+        int candidate_id = -1;
+
+        for (int i=0; i<this->neighborhood->size(); i++){
+            if (this->neighborhood_scores->at(i) > this->best_score){
+                this->best_score = this->neighborhood_scores->at(i);
+                this->best_solution = this->neighborhood->at(i);
+                candidate_id = i;
             }
         }
 
-        finished = !this->best_score.is_updated();
+        this->finished = !this->best_score.is_updated();
+        this->PrepareVerboseUnit(candidate_id);
 
-        this->PrepareVerboseUnit(ptr, -1);
     }
 
 public:
@@ -38,12 +39,8 @@ public:
 template<typename Vector, typename Field>
 class DFS : public BaseHoodSolver<Vector, Field> {
 protected:
-    bool finished = false;
 
     void do_optimization_step(int step) override {
-        if (finished) {
-            return;
-        }
 
         this->TryToUpdateHood();
 
@@ -61,7 +58,7 @@ protected:
             this->should_update_hood = true;
         }
 
-        finished = this->IsEmptyHood() && !this->best_score.is_updated();
+        this->finished = this->IsEmptyHood() && !this->best_score.is_updated();
 
     }
 

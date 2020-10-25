@@ -13,4 +13,4 @@ endfunction(build_lab)
 
 build_lab(lab1_monte_carlo)
 build_lab(lab2_dfs)
-# build_lab(lab3_bfs)
+build_lab(lab3_bfs)

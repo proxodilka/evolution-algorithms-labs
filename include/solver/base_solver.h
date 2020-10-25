@@ -43,6 +43,7 @@ protected:
     IntProxy best_score;
 
     bool verbose = true;
+    bool finished = false;
     virtual void do_optimization_step(int step) = 0;
 
     virtual void InitTraining() {
@@ -56,7 +57,17 @@ protected:
         this->verbose_unit = std::make_shared<VerboseUnit<Vector>>(best_solution, best_score); 
     }
 
+    void print_verbose_init(std::ostream& out = std::cout){
+        if (!this->verbose){
+            return;
+        }
+        out << "Step " << 0 << ": " << "Initial values" << "\n\tCurrent optimum: " << best_solution << " : " << best_score << "\n";
+    }
+
     void print_verbose_step(int step, const VerboseUnit<Vector>& verbose_unit, std::ostream& out = std::cout) {
+        if (!this->verbose){
+            return;
+        }
         std::string extra_str = "";
         if (best_score.is_updated()) {
             extra_str = " Optimum was updated on this step!";
@@ -108,6 +119,9 @@ protected:
     }
 
     void print_verbose_result(int steps, std::ostream& out = std::cout) {
+        if (!this->verbose){
+            return;
+        }
         out << "\nBest solution that was found for " << steps << " steps:\n\tCurrent optimum: " 
             << best_solution << " : " << best_score << "\n";
     }
@@ -120,16 +134,17 @@ public:
         history.clear();
         history.reserve(steps);
         InitTraining();
-
-        for (int i=0; i<steps; i++){
+        this->print_verbose_init();
+        int i = 0;
+        for (; i<steps; i++){
+            if (finished) {
+                break;
+            }
             this->do_optimization_step(i);
             history.push_back(best_score);
-            //std::cout << i << std::endl;
-            if (verbose){
-                this->print_verbose_step(i, *(this->verbose_unit));
-            }
+            this->print_verbose_step(i + 1, *(this->verbose_unit));
         }
-        this->print_verbose_result(steps);
+        this->print_verbose_result(i);
     }
 
     int score(const Vector& vector) { return this->scorer(vector); }

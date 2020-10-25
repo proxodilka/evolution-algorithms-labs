@@ -10,13 +10,14 @@
 #include "utils/utils.h"
 #include "field/field.h"
 #include "field/alphabet.h"
+#include "field/vector.h"
 #include "utils/scorers.h"
 #include "solver/hill_climbing.h"
 #include "menu.h"
 
-const int N = 5;
+const int N = 8;
 
-using VectorType = std::vector<int>;
+using VectorType = SearchFields::Vector<int>;
 using AlphabetType = SearchFields::Alphabet<int>;
 using FieldType = SearchFields::Field<int, N>;
 using SolverType = Solver::BFS<VectorType, FieldType>;
@@ -40,9 +41,9 @@ void execute_lab(ScoreFunction score_fn_builder) {
 }
 
 std::vector<menuItem> main_menu_options = {
-    {"Random score function", [](){ execute_lab(Scorers::build_random<VectorType>); }},
-    {"Binary to int score function", [](){ execute_lab(std::bind(Scorers::build_bin_to_int<VectorType>, std::placeholders::_1, true)); }},
-    {"Square deviation score function", [](){ execute_lab(std::bind(Scorers::build_square<VectorType>, std::placeholders::_1, N, true)); }}
+    {"Random score function", [](){ execute_lab(Scorers::build_random<AlphabetType>); }},
+    {"Binary to int score function", [](){ execute_lab(std::bind(Scorers::build_bin_to_int<AlphabetType>, std::placeholders::_1)); }},
+    {"Square deviation score function", [](){ execute_lab(std::bind(Scorers::build_square<AlphabetType>, std::placeholders::_1, N)); }}
 };
 
 int main(int argc, char* argv[])
