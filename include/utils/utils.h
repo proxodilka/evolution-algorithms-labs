@@ -19,7 +19,7 @@ int random(int max) {
     return random(0, max);
 }
 
-int random(const std::vector<int>& restrict_mask) {
+int random(const std::vector<bool>& restrict_mask) {
     int value = random(0, restrict_mask.size());
     for (; restrict_mask[value % restrict_mask.size()]; value++) {}
     return value % restrict_mask.size();

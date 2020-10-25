@@ -41,7 +41,7 @@ protected:
 
     void ResetMask() {
         neighborhood_mask.clear();
-        neighborhood_mask.reserve(neighborhood->size());
+        neighborhood_mask.resize(neighborhood->size());
     }
 
     void ResetScores() {
@@ -66,7 +66,6 @@ protected:
     void UpdateHood() {
         this->neighborhood = Solver::Utils::GetNeighborhoodHeming(this->best_solution, this->field);
         this->in_hood = this->neighborhood->size();
-        this->empty_hood = false;
         this->ResetScores();
         this->ResetMask();
     }

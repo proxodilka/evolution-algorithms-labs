@@ -11,6 +11,6 @@ function(build_lab CPP_NAME)
     target_include_directories(${CPP_NAME} PUBLIC ${INCLUDE_DIR} "dependencies/menu")
 endfunction(build_lab)
 
- build_lab(lab1_monte_carlo)
-# build_lab(lab2_dfs)
+# build_lab(lab1_monte_carlo)
+build_lab(lab2_dfs)
 # build_lab(lab3_bfs)
