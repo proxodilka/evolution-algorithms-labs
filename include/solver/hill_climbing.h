@@ -48,8 +48,9 @@ protected:
         this->TryToUpdateHood();
 
         auto ptr = this->neighborhood;
-
+        //std::cout << step << " " << this->neighborhood_mask.size() << std::endl;
         int candidate_id = ::Utils::random(this->neighborhood_mask);
+        this->PrepareVerboseUnit(candidate_id);
         this->RemoveFromHood(candidate_id);
 
         int candidate_score = this->neighborhood_scores->at(candidate_id);
@@ -57,11 +58,11 @@ protected:
         if (candidate_score > this->best_score){
             this->best_solution = (*ptr)[candidate_id];
             this->best_score = candidate_score;
+            this->should_update_hood = true;
         }
 
         finished = this->IsEmptyHood() && !this->best_score.is_updated();
 
-        this->PrepareVerboseUnit(candidate_id);
     }
 
 public:

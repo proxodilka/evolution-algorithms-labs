@@ -20,28 +20,33 @@ protected:
 
     int in_hood = 0;
 
+    bool should_update_hood = true;
+
     void PrepareVerboseUnit(int candidate_id) {
         if (!this->verbose){
             return;
         }
 
-
-        this->verbose_unit = std::make_shared<VerboseUnit<Vector>>(this->neighborhood, this->neighborhood_scores, candidate_id);
+        this->verbose_unit = std::make_shared<VerboseUnit<Vector>>(this->neighborhood, this->neighborhood_scores,
+                            candidate_id, this->neighborhood_mask);
     }
 
     void TryToUpdateHood() {
-        if (this->IsEmptyHood()) {
+        if (this->should_update_hood || this->IsEmptyHood()) {
             this->UpdateHood();
+            this->should_update_hood = false;
         }
     }
 
     bool IsEmptyHood() {
-        return this->in_hood;
+        return !this->in_hood;
     }
 
     void ResetMask() {
+        std::cout << "mask reseted" << std::endl;
         neighborhood_mask.clear();
         neighborhood_mask.resize(neighborhood->size());
+        //std::cout << "mask size " << this->neighborhood->size() << " " << this->neighborhood_mask.size() << std::endl;
     }
 
     void ResetScores() {
@@ -59,7 +64,7 @@ protected:
     }
 
     void RemoveFromHood(int i){
-        this->neighborhood_mask[i] = true;
+        neighborhood_mask[i] = true;
         this->in_hood--;
     }
 

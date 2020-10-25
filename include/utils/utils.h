@@ -21,6 +21,8 @@ int random(int max) {
 
 int random(const std::vector<bool>& restrict_mask) {
     int value = random(0, restrict_mask.size());
+    // std::cout << "mask: ";
+    // for (int i=0; i<restrict_mask.size(); i++) { std::cout << restrict_mask[i] << " ";} std::cout << std::endl;
     for (; restrict_mask[value % restrict_mask.size()]; value++) {}
     return value % restrict_mask.size();
 }

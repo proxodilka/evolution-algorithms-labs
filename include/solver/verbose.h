@@ -20,7 +20,7 @@ class VerboseUnit {
 
     std::shared_ptr<std::vector<Vector>> variants;
     std::shared_ptr<std::vector<int>> scores;
-    std::shared_ptr<std::vector<bool>> variants_mask;
+    std::vector<bool> variants_mask;
 
     int picked_id;
 
@@ -35,11 +35,12 @@ public:
     VerboseUnit(const Vector& solution, int score): 
         variants(std::make_shared<std::vector<Vector>>(std::initializer_list<Vector>({solution}))),
         scores(std::make_shared<std::vector<int>>(std::initializer_list<int>({score}))), picked_id(0), empty(false),
-        variants_mask(std::make_shared<std::vector<bool>>((*variants).size())) {}
+        variants_mask(std::vector<bool>(variants->size())) {}
 
-    VerboseUnit(std::shared_ptr<std::vector<Vector>> variants, std::shared_ptr<std::vector<int>> scores, int picked_id):
+    VerboseUnit(std::shared_ptr<std::vector<Vector>> variants, std::shared_ptr<std::vector<int>> scores,
+                int picked_id, const std::vector<bool>& variants_mask):
         variants(variants), scores(scores), picked_id(picked_id), empty(false),
-        variants_mask(std::make_shared<std::vector<bool>>((*variants).size())) {}
+        variants_mask(variants_mask) {}
 
     bool is_empty() const { return empty; }
     int size() const { return (*variants).size(); }
@@ -47,7 +48,7 @@ public:
     int get_picked_id() const { return picked_id; }
 
     VerboseElement<Vector> operator[](int i) const {
-        return VerboseElement<Vector>(std::pair<const Vector&, int>((*variants)[i], (*scores)[i]), (*variants_mask)[i]);
+        return VerboseElement<Vector>(std::pair<const Vector&, int>(variants->at(i), scores->at(i)), variants_mask.at(i));
     }
 };
 

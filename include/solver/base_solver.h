@@ -79,7 +79,13 @@ protected:
             return result;
         };
 
-        auto variant_printer = [&](int step, bool is_picked, auto variant) {
+        bool new_step = true;
+        auto variant_printer = [&](bool is_picked, auto variant) {
+            static int step = 0;
+            if (new_step) {
+                new_step = false;
+                step = 0;
+            }
             if (variant.is_empty) {
                 return;
             }
@@ -92,11 +98,12 @@ protected:
                 out << " <--- this variant was picked to compare";
             }
             out << "\n";
+            step++;
         };
 
         bool is_single_variant = verbose_unit.size() == 1;
         for (int i=0; i<verbose_unit.size(); i++){
-            variant_printer(i, (picked_id == i) && !is_single_variant, verbose_unit[i]);
+            variant_printer((picked_id == i), verbose_unit[i]);
         }
     }
 
