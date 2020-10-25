@@ -45,5 +45,5 @@ std::shared_ptr<std::vector<Vector>> GetNeighborhoodHeming(const Vector& vector,
 }
 
 
-} // namespace utils
-} // namespace Solvers
+} // namespace Utils
+} // namespace Solver

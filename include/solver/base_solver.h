@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
+#include "solver/verbose.h"
 
 namespace Solver{
 
@@ -26,42 +27,6 @@ public:
     }
 };
 
-template<typename Vector>
-class VerboseUnit {
-    using Variant = std::pair<Vector, int>;
-
-    std::shared_ptr<std::vector<Vector>> variants;
-    std::shared_ptr<std::vector<int>> scores;
-
-    int picked_id;
-
-    const bool empty;
-public:
-    VerboseUnit(): empty(true) {}
-
-    VerboseUnit(const Variant picked_variant): variants(std::make_shared<Vector>({picked_variant.first})),
-        scores(std::make_shared<std::vector<int>>({picked_variant.second})), picked_id(0), empty(false) {}
-    
-    VerboseUnit(const Vector& solution, int score): 
-        variants(std::make_shared<std::vector<Vector>>(std::initializer_list<Vector>({solution}))),
-        scores(std::make_shared<std::vector<int>>(std::initializer_list<int>({score}))), picked_id(0), empty(false) {}
-
-    VerboseUnit(std::shared_ptr<std::vector<Vector>> variants, std::shared_ptr<std::vector<int>> scores, int picked_id):
-        variants(variants), scores(scores), picked_id(picked_id) {}
-
-    bool is_empty() const { return empty; }
-    int size() const { return (*variants).size(); }
-
-    int get_picked_id() const { return picked_id; }
-
-    std::pair<const Vector&, int> operator[](int i) const {
-        if (i >= (*variants).size()){
-            throw std::invalid_argument("Incorrect index");
-        }
-
-        return std::pair<const Vector&, int>((*variants)[i], (*scores)[i]);
-    }
-};
 
 template<typename Vector, typename Field>
 class BaseSolver {
@@ -77,6 +42,7 @@ protected:
 
     IntProxy best_score;
 
+    bool verbose = true;
     virtual void do_optimization_step(int step) = 0;
 
     virtual void InitTraining() {
@@ -114,10 +80,14 @@ protected:
         };
 
         auto variant_printer = [&](int step, bool is_picked, auto variant) {
+            if (variant.is_empty) {
+                return;
+            }
+            auto variants = variant.value;
             if (step) {
                 out << "\t" << generate_spaces(step_label_len);
             }
-            out << variant.first << " : " << variant.second;
+            out << variants.first << " : " << variants.second;
             if (is_picked) {
                 out << " <--- this variant was picked to compare";
             }
@@ -139,6 +109,7 @@ public:
     BaseSolver(Field& field, const std::function<int(const Vector&)>& scorer): field(field), scorer(scorer), best_score(-INT_MAX) {}
 
     void TrainModel(int steps=500, bool verbose=true) {
+        this->verbose = verbose;
         history.clear();
         history.reserve(steps);
         InitTraining();
@@ -167,40 +138,6 @@ public:
 
         return landscape_fitness;
     }
-};
-
-template<typename Vector, typename Field>
-class BaseBinarySolver : public BaseSolver<Vector, Field> {
-protected:
-    const typename Field::Alphabet& alphabet;
-
-    void PrepareVerboseUnit(std::shared_ptr<Vector> candidates, int candidate_id) {
-        if (!this->verbose){
-            return;
-        }
-
-        std::vector<int> scores;;
-
-        int size = (*candidates).size();
-        scores.reserve(size);
-        for (int i=0; i<size; i++){
-            scores.push_back(this->score((*candidates)[i]));
-        }
-
-        this->verbose_unit = std::make_shared<VerboseUnit<Vector>>(candidates, std::make_shared<std::vector<int>>(std::move(scores)), candidate_id);
-
-    }
-
-public:
-    BaseBinarySolver(Field& field, const std::function<int(const Vector&)>& scorer): 
-                        BaseSolver<Vector, Field>(field, scorer), alphabet(field.get_alphabet()) {
-        if (field.get_alphabet().size() != 2) {
-            delete this; // since throwing exception in an object constructor don't triggers
-                         // objects destructor to be executed, calling destructor explicitly
-            throw std::invalid_argument("Can't construct BinarySolver with Field whose alphabet is not binary.");
-        }
-    }
-
 };
 
 } // namespace Solver

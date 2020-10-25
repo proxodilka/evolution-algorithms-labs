@@ -1,13 +1,13 @@
 #pragma once
 
-#include "solver/base_solver.h"
+#include "solver/base_hood.h"
 #include "solver/utils.h"
 #include "utils/utils.h"
 
 namespace Solver{
 
 template<typename Vector, typename Field>
-class BFS : public BaseBinarySolver<Vector, Field> {
+class BFS : public BaseHoodSolver<Vector, Field> {
 protected:
     bool finished = false;
 
@@ -31,12 +31,12 @@ protected:
     }
 
 public:
-    using BaseBinarySolver<Vector, Field>::BaseBinarySolver;
+    using BaseHoodSolver<Vector, Field>::BaseHoodSolver;
 
 };
 
 template<typename Vector, typename Field>
-class DFS : public BaseBinarySolver<Vector, Field> {
+class DFS : public BaseHoodSolver<Vector, Field> {
 protected:
     bool finished = false;
 
@@ -45,25 +45,27 @@ protected:
             return;
         }
 
-        auto ptr = Solver::Utils::GetNeighborhoodHeming(this->best_solution, this->field);
-        //std::cout << (*ptr).size()  << " " << step << std::endl;
-        int candidate_id = ::Utils::random((*ptr).size());
+        this->TryToUpdateHood();
 
-        auto new_candidate = (*ptr)[candidate_id];
-        int candidate_score = this->score(new_candidate);
+        auto ptr = this->neighborhood;
+
+        int candidate_id = ::Utils::random(this->neighborhood_mask);
+        this->RemoveFromHood(candidate_id);
+
+        int candidate_score = this->neighborhood_scores->at(candidate_id);
 
         if (candidate_score > this->best_score){
-            this->best_solution = new_candidate;
+            this->best_solution = (*ptr)[candidate_id];
             this->best_score = candidate_score;
         }
 
-        finished = !this->best_score.is_updated();
+        finished = this->IsEmptyHood() && !this->best_score.is_updated();
 
-        this->PrepareVerboseUnit(ptr, candidate_id);
+        this->PrepareVerboseUnit(candidate_id);
     }
 
 public:
-    using BaseBinarySolver<Vector, Field>::BaseBinarySolver;
+    using BaseHoodSolver<Vector, Field>::BaseHoodSolver;
 
 };
 
