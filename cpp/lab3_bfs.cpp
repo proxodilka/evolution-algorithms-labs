@@ -17,8 +17,8 @@
 const int N = 5;
 
 using VectorType = std::vector<int>;
-using AlphabetType = SerachFields::Alphabet<int>;
-using FieldType = SerachFields::Field<int, N>;
+using AlphabetType = SearchFields::Alphabet<int>;
+using FieldType = SearchFields::Field<int, N>;
 using SolverType = Solver::BFS<VectorType, FieldType>;
 
 

@@ -16,7 +16,7 @@
 const int N = 15;
 
 using VectorType = std::vector<int>;
-using FieldType = SerachFields::Field<VectorType, N>;
+using FieldType = SearchFields::Field<VectorType, N>;
 using SolverType = Solver::BaseSolver<VectorType, FieldType>;
 
 

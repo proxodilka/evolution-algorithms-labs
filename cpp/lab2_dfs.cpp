@@ -17,9 +17,9 @@
 
 const int N = 5;
 
-using VectorType = SerachFields::Vector<int>;
-using AlphabetType = SerachFields::Alphabet<int>;
-using FieldType = SerachFields::Field<int, N>;
+using VectorType = SearchFields::Vector<int>;
+using AlphabetType = SearchFields::Alphabet<int>;
+using FieldType = SearchFields::Field<int, N>;
 using SolverType = Solver::DFS<VectorType, FieldType>;
 
 

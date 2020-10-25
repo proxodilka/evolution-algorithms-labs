@@ -22,7 +22,7 @@ std::ostream& operator<<(std::ostream& out, const std::vector<T>& value)
     return out;
 }
 
-namespace SerachFields {
+namespace SearchFields {
 
 template <typename Vector, int N>
 class iterator;

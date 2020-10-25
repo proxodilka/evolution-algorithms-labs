@@ -43,10 +43,8 @@ protected:
     }
 
     void ResetMask() {
-        std::cout << "mask reseted" << std::endl;
         neighborhood_mask.clear();
         neighborhood_mask.resize(neighborhood->size());
-        //std::cout << "mask size " << this->neighborhood->size() << " " << this->neighborhood_mask.size() << std::endl;
     }
 
     void ResetScores() {

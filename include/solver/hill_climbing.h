@@ -48,7 +48,7 @@ protected:
         this->TryToUpdateHood();
 
         auto ptr = this->neighborhood;
-        //std::cout << step << " " << this->neighborhood_mask.size() << std::endl;
+
         int candidate_id = ::Utils::random(this->neighborhood_mask);
         this->PrepareVerboseUnit(candidate_id);
         this->RemoveFromHood(candidate_id);

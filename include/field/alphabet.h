@@ -7,7 +7,7 @@
 
 #include "utils/type_helper.h"
 
-namespace SerachFields {
+namespace SearchFields {
 
 template <typename T>
 class Alphabet : public std::vector<T>
@@ -40,4 +40,4 @@ private:
     std::unordered_map<LetterType, int> _letter_to_int;
 };
 
-} // namespace SerachFields 
+} // namespace SearchFields 
