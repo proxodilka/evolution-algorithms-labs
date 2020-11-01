@@ -16,9 +16,9 @@ protected:
 
         auto ptr = this->neighborhood;
 
-        int candidate_id = -1;
+        int64_t candidate_id = -1;
 
-        for (int i=0; i<this->neighborhood->size(); i++){
+        for (int64_t i=0; i<this->neighborhood->size(); i++){
             if (this->neighborhood_scores->at(i) > this->best_score){
                 this->best_score = this->neighborhood_scores->at(i);
                 this->best_solution = this->neighborhood->at(i);
@@ -46,11 +46,11 @@ protected:
 
         auto ptr = this->neighborhood;
 
-        int candidate_id = ::Utils::random(this->neighborhood_mask);
+        int64_t candidate_id = ::Utils::random(this->neighborhood_mask);
         this->PrepareVerboseUnit(candidate_id);
         this->RemoveFromHood(candidate_id);
 
-        int candidate_score = this->neighborhood_scores->at(candidate_id);
+        int64_t candidate_score = this->neighborhood_scores->at(candidate_id);
 
         if (candidate_score > this->best_score){
             this->best_solution = (*ptr)[candidate_id];

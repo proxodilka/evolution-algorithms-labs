@@ -10,15 +10,15 @@ namespace Solver{
 
 class IntProxy {
     bool _is_updated;
-    int _value;
+    int64_t _value;
 public:
-    IntProxy(int value): _value(value), _is_updated(false) {}
+    IntProxy(int64_t value): _value(value), _is_updated(false) {}
 
-    int value() { return _value; }
+    int64_t value() { return _value; }
     bool is_updated() { return _is_updated; }
     void clear() { _is_updated = false; }
 
-    operator int() {return value(); }
+    operator int64_t() { return value(); }
 
     IntProxy& operator=(const IntProxy& other) {
         _is_updated = true;
@@ -31,13 +31,12 @@ public:
 template<typename Vector, typename Field>
 class BaseSolver {
 protected:
-    std::vector<Vector> population;
     Vector best_solution;
     std::function<int(const Vector&)> scorer;
     Field& field;
     std::shared_ptr<VerboseUnit<Vector>> verbose_unit;
 
-    std::unordered_map<int, int> landscape_fitness;
+    std::unordered_map<int64_t, int64_t> landscape_fitness;
     std::vector<int> history;
 
     IntProxy best_score;
@@ -149,16 +148,21 @@ public:
 
     int score(const Vector& vector) { return this->scorer(vector); }
 
-    const std::unordered_map<int, int>& GetLandscapeFitness() {
+    const std::unordered_map<int64_t, int64_t>& GetLandscapeFitness() {
         if (landscape_fitness.size() > 0) {
             return landscape_fitness;
         }
 
-        for (auto [it, i] = std::tuple({field.begin(), 0}); ++it, ++i; it != field.end()) {
+        int64_t i=0;
+        for (auto it = field.begin(); it != field.end(); ++it, ++i) {
             landscape_fitness.insert({i, score(*it)});
         }
 
         return landscape_fitness;
+    }
+
+    void PrintFitnessLandScape(int64_t max=32) {
+        verbose_unit->PrintFitnessLandScape(GetLandscapeFitness(), field, max);
     }
 };
 

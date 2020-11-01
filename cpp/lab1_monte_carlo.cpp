@@ -12,16 +12,17 @@
 #include "field/alphabet.h"
 #include "field/vector.h"
 #include "utils/scorers.h"
-#include "solver/monte_carlo.h"
 #include "menu.h"
 
+#include "solver/monte_carlo.h"
+
+const int MAX_NLANDSCAPE = 32;
 const int N = 15;
 
 using VectorType = SearchFields::Vector<int>;
 using AlphabetType = SearchFields::Alphabet<int>;
 using FieldType = SearchFields::Field<int, N>;
 using SolverType = Solver::MonteCarlo<VectorType, FieldType>;
-
 
 
 template<typename ScoreFunction>
@@ -34,6 +35,7 @@ void execute_lab(ScoreFunction score_fn_builder) {
 
     int nsteps;
 
+    _solver.PrintFitnessLandScape(MAX_NLANDSCAPE);
     std::cout << "Print number of steps:\n>";
     std::cin >> nsteps;
 

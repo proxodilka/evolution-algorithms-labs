@@ -9,10 +9,10 @@ class MonteCarlo : public BaseSolver<Vector, Field> {
 protected:
 
     void do_optimization_step(int step) override {
-        int rand_index = Utils::random(this->field.__approximate_size());
+        int64_t rand_index = Utils::random(this->field.__approximate_size());
         auto& new_candidate = this->field[rand_index];
 
-        int new_score = this->score(new_candidate);
+        int64_t new_score = this->score(new_candidate);
         if (new_score > this->best_score) {
             this->best_score = new_score;
             this->best_solution = new_candidate;

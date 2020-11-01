@@ -11,18 +11,38 @@ namespace Solver {
 
 template<typename Vector, typename Field>
 class BaseHoodSolver : public BaseSolver<Vector, Field> {
+private:
+    int64_t in_hood = 0;
+
+    void ResetMask() {
+        neighborhood_mask.clear();
+        neighborhood_mask.resize(neighborhood->size());
+    }
+
+    void ResetScores() {
+        if (!neighborhood_scores.use_count()){
+            neighborhood_scores = std::make_shared<std::vector<int64_t>>();
+        }
+        neighborhood_scores->clear();
+
+        int64_t size = neighborhood->size();
+        neighborhood_scores->reserve(size);
+
+        for (int64_t i=0; i<size; i++){
+            neighborhood_scores->push_back(this->score(neighborhood->at(i)));
+        }
+    }
+
 protected:
     const typename Field::Alphabet& alphabet;
 
     std::shared_ptr<std::vector<Vector>> neighborhood;
-    std::shared_ptr<std::vector<int>> neighborhood_scores;
+    std::shared_ptr<std::vector<int64_t>> neighborhood_scores;
     std::vector<bool> neighborhood_mask;
-
-    int in_hood = 0;
 
     bool should_update_hood = true;
 
-    void PrepareVerboseUnit(int candidate_id) {
+    void PrepareVerboseUnit(int64_t candidate_id) {
         if (!this->verbose){
             return;
         }
@@ -42,26 +62,7 @@ protected:
         return !this->in_hood;
     }
 
-    void ResetMask() {
-        neighborhood_mask.clear();
-        neighborhood_mask.resize(neighborhood->size());
-    }
-
-    void ResetScores() {
-        if (!neighborhood_scores.use_count()){
-            neighborhood_scores = std::make_shared<std::vector<int>>();
-        }
-        neighborhood_scores->clear();
-
-        int size = neighborhood->size();
-        neighborhood_scores->reserve(size);
-
-        for (int i=0; i<size; i++){
-            neighborhood_scores->push_back(this->score(neighborhood->at(i)));
-        }
-    }
-
-    void RemoveFromHood(int i){
+    void RemoveFromHood(int64_t i){
         neighborhood_mask[i] = true;
         this->in_hood--;
     }

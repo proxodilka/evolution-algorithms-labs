@@ -32,15 +32,15 @@ int random() {
 }
 
 template<typename Container, typename T>
-int GetOffset(const Container& vec, const T& value) {
+int64_t GetOffset(const Container& vec, const T& value) {
     auto it = std::find(vec.cbegin(), vec.cend(), value);
     return it - vec.cbegin();
 }
 
 template<typename Vector, typename AlphabetType>
-int ToInteger(const Vector& value, const AlphabetType& alphabet) {
+int64_t ToInteger(const Vector& value, const AlphabetType& alphabet) {
     int power = alphabet.size();
-    int result = 0;
+    int64_t result = 0;
 
     for (int r_i = value.size() - 1, i = 0; r_i>=0; r_i--, i++) {
         result += GetOffset(alphabet, value[r_i]) * std::pow(power, i);
@@ -50,7 +50,7 @@ int ToInteger(const Vector& value, const AlphabetType& alphabet) {
 }
 
 template<int N=0, typename Vector, typename AlphabetType>
-std::shared_ptr<Vector> FromInteger(int x, const AlphabetType& alphabet){
+std::shared_ptr<Vector> FromInteger(int64_t x, const AlphabetType& alphabet){
     int alphabet_power = alphabet.size();
     std::vector<int> translated;
     translated.reserve(N);
@@ -80,8 +80,8 @@ std::shared_ptr<Vector> FromInteger(int x, const AlphabetType& alphabet){
 template<typename Value, typename FuncType, typename HasherType>
 auto cache_calls(FuncType fn, HasherType hash_fn) {
     return [fn, hash_fn](auto... args) {
-        static std::unordered_map<int, Value> cache;
-        int hash = hash_fn(args...);
+        static std::unordered_map<int64_t, Value> cache;
+        int64_t hash = hash_fn(args...);
 
         auto cache_res = cache.find(hash);
         if (cache_res != cache.end()) {
