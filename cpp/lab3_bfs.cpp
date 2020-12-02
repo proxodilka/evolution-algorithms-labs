@@ -17,7 +17,7 @@
 #include "solver/hill_climbing.h"
 
 const int MAX_NLANDSCAPE = 32;
-const int N = 15;
+const int N = 5;
 
 using VectorType = SearchFields::Vector<int>;
 using AlphabetType = SearchFields::Alphabet<int>;

@@ -48,6 +48,11 @@ void Menu::read_option() {
 
 	input.clear();
 	input >> choise;
+	
+	if (choise == "q") {
+		std::terminate();
+	}
+
 	try {
 		choise_int = stoi(choise);
 

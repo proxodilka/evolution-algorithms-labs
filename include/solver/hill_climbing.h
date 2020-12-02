@@ -33,7 +33,11 @@ protected:
 
 public:
     using BaseHoodSolver<Vector, Field>::BaseHoodSolver;
+    constexpr static const char* name = "Breadth-first search";
 
+    virtual std::string get_name() {
+        return this->name;
+    }
 };
 
 template<typename Vector, typename Field>
@@ -50,7 +54,7 @@ protected:
         this->PrepareVerboseUnit(candidate_id);
         this->RemoveFromHood(candidate_id);
 
-        int64_t candidate_score = this->neighborhood_scores->at(candidate_id);
+        double candidate_score = this->neighborhood_scores->at(candidate_id);
 
         if (candidate_score > this->best_score){
             this->best_solution = (*ptr)[candidate_id];
@@ -64,7 +68,11 @@ protected:
 
 public:
     using BaseHoodSolver<Vector, Field>::BaseHoodSolver;
+    constexpr static const char* name = "Depth-first search";
 
+    virtual std::string get_name() {
+        return this->name;
+    }
 };
 
 } // namespace Solver

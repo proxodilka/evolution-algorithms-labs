@@ -10,15 +10,15 @@ namespace Solver{
 
 class IntProxy {
     bool _is_updated;
-    int64_t _value;
+    double _value;
 public:
-    IntProxy(int64_t value): _value(value), _is_updated(false) {}
+    IntProxy(double value): _value(value), _is_updated(false) {}
 
-    int64_t value() { return _value; }
+    double value() { return _value; }
     bool is_updated() { return _is_updated; }
     void clear() { _is_updated = false; }
 
-    operator int64_t() { return value(); }
+    operator double() { return value(); }
 
     IntProxy& operator=(const IntProxy& other) {
         _is_updated = true;
@@ -32,11 +32,11 @@ template<typename Vector, typename Field>
 class BaseSolver {
 protected:
     Vector best_solution;
-    std::function<int(const Vector&)> scorer;
+    std::function<double(const Vector&)> scorer;
     Field& field;
     std::shared_ptr<VerboseUnit<Vector>> verbose_unit;
 
-    std::unordered_map<int64_t, int64_t> landscape_fitness;
+    std::unordered_map<int64_t, double> landscape_fitness;
     std::vector<int> history;
 
     IntProxy best_score;
@@ -48,11 +48,11 @@ protected:
     virtual void InitTraining() {
         best_solution = field[::Utils::random(field.__approximate_size())];
         best_score = score(best_solution);
-
+        this->finished = false;
         best_score.clear();
     }
 
-    void PrepareVerboseUnit(Vector best_solution, int best_score) {
+    void PrepareVerboseUnit(Vector best_solution, double best_score) {
         this->verbose_unit = std::make_shared<VerboseUnit<Vector>>(best_solution, best_score); 
     }
 
@@ -126,9 +126,15 @@ protected:
     }
 
 public:
-    BaseSolver(Field& field, const std::function<int(const Vector&)>& scorer): field(field), scorer(scorer), best_score(-INT_MAX) {}
+    BaseSolver(Field& field, const std::function<double(const Vector&)>& scorer): field(field), scorer(scorer), best_score(-INT_MAX) {}
 
-    void TrainModel(int steps=500, bool verbose=true) {
+    constexpr static const char* name = "Base";
+
+    virtual std::string get_name() {
+        return this->name;
+    }
+
+    std::pair<Vector, double> TrainModel(int steps=500, bool verbose=true) {
         this->verbose = verbose;
         history.clear();
         history.reserve(steps);
@@ -144,11 +150,13 @@ public:
             this->print_verbose_step(i + 1, *(this->verbose_unit));
         }
         this->print_verbose_result(i);
+
+        return std::pair<Vector, double>(best_solution, best_score);
     }
 
-    int score(const Vector& vector) { return this->scorer(vector); }
+    double score(const Vector& vector) { return this->scorer(vector); }
 
-    const std::unordered_map<int64_t, int64_t>& GetLandscapeFitness() {
+    const std::unordered_map<int64_t, double>& GetLandscapeFitness() {
         if (landscape_fitness.size() > 0) {
             return landscape_fitness;
         }

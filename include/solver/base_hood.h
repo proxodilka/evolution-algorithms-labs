@@ -21,7 +21,7 @@ private:
 
     void ResetScores() {
         if (!neighborhood_scores.use_count()){
-            neighborhood_scores = std::make_shared<std::vector<int64_t>>();
+            neighborhood_scores = std::make_shared<std::vector<double>>();
         }
         neighborhood_scores->clear();
 
@@ -37,7 +37,7 @@ protected:
     const typename Field::Alphabet& alphabet;
 
     std::shared_ptr<std::vector<Vector>> neighborhood;
-    std::shared_ptr<std::vector<int64_t>> neighborhood_scores;
+    std::shared_ptr<std::vector<double>> neighborhood_scores;
     std::vector<bool> neighborhood_mask;
 
     bool should_update_hood = true;
@@ -74,14 +74,25 @@ protected:
         this->ResetMask();
     }
 
+    void InitTraining() override {
+        BaseSolver<Vector, Field>::InitTraining();
+        this->UpdateHood();
+    }
+
 public:
-    BaseHoodSolver(Field& field, const std::function<int(const Vector&)>& scorer): 
+    BaseHoodSolver(Field& field, const std::function<double(const Vector&)>& scorer): 
                         BaseSolver<Vector, Field>(field, scorer), alphabet(field.get_alphabet()) {
         if (field.get_alphabet().size() != 2) {
             delete this; // since throwing exception in an object constructor don't triggers
                          // objects destructor to be executed, calling destructor explicitly
             throw std::invalid_argument("Can't construct BinarySolver with Field whose alphabet is not binary.");
         }
+    }
+
+    constexpr static const char* name = "Base Hood Solver";
+
+    virtual std::string get_name() {
+        return this->name;
     }
 
 };

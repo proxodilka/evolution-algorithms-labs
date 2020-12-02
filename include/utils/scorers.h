@@ -38,4 +38,13 @@ std::function<int64_t(const VectorType&)> build_square(const AlphabetType& alpha
     return Utils::cache_calls<int64_t>(fn, std::bind(Utils::ToInteger<VectorType, AlphabetType>, std::placeholders::_1, alphabet));
 };
 
+template<typename AlphabetType, typename VectorType = typename Utils::rebind_container<AlphabetType, SearchFields::Vector<void>>::value >
+std::function<double(const VectorType&)> build_sin_ln(const AlphabetType& alphabet, int64_t field_size) {
+    auto fn = [=](const VectorType& vector) {
+        double value = Utils::ToInteger(vector, alphabet);
+        return 5 * std::sin(value) + std::log(value);
+    };
+    return fn;
+};
+
 } // namespace Scorers

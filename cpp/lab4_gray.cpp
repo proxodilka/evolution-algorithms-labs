@@ -8,7 +8,7 @@
 #include <memory> 
 
 #include "utils/utils.h"
-#include "field/field.h"
+#include "field/gray_field.h"
 #include "field/alphabet.h"
 #include "field/vector.h"
 #include "utils/scorers.h"
@@ -21,8 +21,8 @@ const int N = 5;
 
 using VectorType = SearchFields::Vector<int>;
 using AlphabetType = SearchFields::Alphabet<int>;
-using FieldType = SearchFields::Field<int, N>;
-using SolverType = Solver::DFS<VectorType, FieldType>;
+using FieldType = SearchFields::GrayField<int, N>;
+using SolverType = Solver::BFS<VectorType, FieldType>;
 
 
 template<typename ScoreFunction>

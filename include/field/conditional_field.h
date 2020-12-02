@@ -5,10 +5,10 @@
 #include <vector>
 #include <functional>
 
-namespace field {
+namespace SearchFields {
 
 template <typename LetterType, int N>
-class ConditionalField : Field<LetterType, N> {
+class ConditionalField : public Field<LetterType, N> {
     std::function<bool(const Vector&)> filter;
 
 	std::shared_ptr<Vector> _try_to_generate_element(int64_t i) const {
@@ -37,4 +37,4 @@ public:
 	}
 };
 
-} // namespace field
+} // namespace SearchFields

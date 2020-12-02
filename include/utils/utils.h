@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "field/vector.h"
+
 
 namespace Utils{
 
@@ -21,8 +23,6 @@ int random(int max) {
 
 int random(const std::vector<bool>& restrict_mask) {
     int value = random(0, restrict_mask.size());
-    // std::cout << "mask: ";
-    // for (int i=0; i<restrict_mask.size(); i++) { std::cout << restrict_mask[i] << " ";} std::cout << std::endl;
     for (; restrict_mask[value % restrict_mask.size()]; value++) {}
     return value % restrict_mask.size();
 }
@@ -37,8 +37,20 @@ int64_t GetOffset(const Container& vec, const T& value) {
     return it - vec.cbegin();
 }
 
+template<typename Vector>
+std::shared_ptr<Vector> FromGray(const Vector& vector) {
+    Vector out = vector;
+    size_t n = vector.size() - vector.first_non_zero();
+
+    for (size_t i = 1; i <= n; i++) {
+        out ^= (vector >> i);
+    }
+
+    return std::make_shared<Vector>(out);
+}
+
 template<typename Vector, typename AlphabetType>
-int64_t ToInteger(const Vector& value, const AlphabetType& alphabet) {
+int64_t ToIntegerFromRegular(const Vector& value, const AlphabetType& alphabet) {
     int power = alphabet.size();
     int64_t result = 0;
 
@@ -47,6 +59,34 @@ int64_t ToInteger(const Vector& value, const AlphabetType& alphabet) {
     }
 
     return result;
+}
+
+template<typename Vector, typename AlphabetType>
+int64_t ToIntegerFromGray(const Vector& vector, const AlphabetType& alphabet) {
+    auto result = FromGray(vector);
+    return ToIntegerFromRegular(*result, alphabet);
+}
+
+template<typename Vector>
+int64_t ToIntegerFromGray(const Vector& vector) {
+    auto result = FromGray(vector);
+    return ToIntegerFromRegular(*result, std::vector<int>{0, 1});
+}
+
+template<typename Vector, typename AlphabetType>
+int64_t ToInteger(const Vector& vector, const AlphabetType& alphabet) {
+    switch (vector.decode_helper)
+    {
+    case SearchFields::CodeType::REGULAR:
+        return ToIntegerFromRegular(vector, alphabet);
+        break;
+    case SearchFields::CodeType::GRAY:
+        return ToIntegerFromGray(vector, alphabet);
+        break;
+    default:
+        return ToIntegerFromRegular(vector, alphabet);
+        break;
+    }
 }
 
 template<int N=0, typename Vector, typename AlphabetType>
@@ -65,7 +105,6 @@ std::shared_ptr<Vector> FromInteger(int64_t x, const AlphabetType& alphabet){
     for (int i = translated.size(); i < N; i++) {
         translated.push_back(0);
     }
-    std::reverse(translated.begin(), translated.end());
 
     auto result = std::make_shared<Vector>(translated.size());
 
@@ -76,6 +115,18 @@ std::shared_ptr<Vector> FromInteger(int64_t x, const AlphabetType& alphabet){
     return result;
 }
 
+template<typename Vector>
+std::shared_ptr<Vector> ToGray(const Vector& vector) {
+    auto out = (vector ^ (vector >> 1));
+    out.decode_helper = SearchFields::CodeType::GRAY;
+    return std::make_shared<Vector>(std::move(out));
+}
+
+template<int N=0, typename Vector, typename AlphabetType>
+std::shared_ptr<Vector> ToGray(int64_t x, const AlphabetType& alphabet) {
+    auto vector = FromInteger<N, Vector, AlphabetType>(x, alphabet);
+    return ToGray(*vector);
+}
 
 template<typename Value, typename FuncType, typename HasherType>
 auto cache_calls(FuncType fn, HasherType hash_fn) {
